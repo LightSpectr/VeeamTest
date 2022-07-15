@@ -1,0 +1,36 @@
+﻿// ServiceControlCOM.idl: источник языка IDL для ServiceControlCOM
+//
+
+// Этот файл будет обработан средством MIDL для
+// создание библиотеки типов ($handlersafeidlname$.tlb) и кода маршалирования.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(4557e734-2814-4b45-bfb7-d074c5219b78),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IServiceManager : IDispatch
+{
+};
+[
+	uuid(520defd6-ad15-429b-8a77-32491b91655b),
+	version(1.0),
+]
+library ServiceControlCOMLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(b0c6ba7c-e601-4dc9-971e-8d4319fcd912)
+	]
+	coclass ServiceManager
+	{
+		[default] interface IServiceManager;
+	};
+};
+
+import "shobjidl.idl";
