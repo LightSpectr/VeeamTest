@@ -163,6 +163,116 @@ STDMETHODIMP CServiceManager::startSvc()
 }
 
 
+STDMETHODIMP CServiceManager::stopSvc()
+{
+    SERVICE_STATUS_PROCESS ssp;
+    DWORD dwStartTime = GetTickCount();
+    DWORD dwBytesNeeded;
+    DWORD dwTimeout = 30000; // 30-second time-out
+    DWORD dwWaitTime;
+
+    // Get a handle to the SCM database. 
+
+    schSCManager = OpenSCManager(
+        NULL,                    // local computer
+        NULL,                    // ServicesActive database 
+        SC_MANAGER_ALL_ACCESS);  // full access rights 
+
+    if (NULL == schSCManager)
+    {
+        LastError = GetLastError();
+        return E_FAIL;
+    }
+
+    // Get a handle to the service.
+
+    schService = OpenService(
+        schSCManager,         // SCM database 
+        serviceName,            // name of service 
+        SERVICE_STOP |
+        SERVICE_QUERY_STATUS |
+        SERVICE_ENUMERATE_DEPENDENTS);
+
+    if (schService == NULL)
+    {
+        LastError = GetLastError();
+        CloseServiceHandle(schSCManager);
+        return E_FAIL;
+    }
+
+    // Make sure the service is not already stopped.
+
+    if (!QueryServiceStatusEx(
+        schService,
+        SC_STATUS_PROCESS_INFO,
+        (LPBYTE)&ssp,
+        sizeof(SERVICE_STATUS_PROCESS),
+        &dwBytesNeeded))
+    {
+        LastError = GetLastError();
+        CloseServiceHandle(schService);
+        CloseServiceHandle(schSCManager);
+        return E_FAIL;
+    }
+
+    if (ssp.dwCurrentState == SERVICE_STOPPED || ssp.dwCurrentState == SERVICE_STOP_PENDING)
+    {
+        CloseServiceHandle(schService);
+        CloseServiceHandle(schSCManager);
+        return S_FALSE;
+    }
+
+    StopDependentServices();
+
+    // Send a stop code to the service.
+
+    if (!ControlService(
+        schService,
+        SERVICE_CONTROL_STOP,
+        (LPSERVICE_STATUS)&ssp))
+    {
+        LastError = GetLastError();
+        CloseServiceHandle(schService);
+        CloseServiceHandle(schSCManager);
+        return E_FAIL;
+    }
+
+    // Wait for the service to stop.
+
+    while (ssp.dwCurrentState != SERVICE_STOPPED)
+    {
+        Sleep(ssp.dwWaitHint);
+        if (!QueryServiceStatusEx(
+            schService,
+            SC_STATUS_PROCESS_INFO,
+            (LPBYTE)&ssp,
+            sizeof(SERVICE_STATUS_PROCESS),
+            &dwBytesNeeded))
+        {
+            LastError = GetLastError();
+            CloseServiceHandle(schService);
+            CloseServiceHandle(schSCManager);
+            return E_FAIL;
+        }
+
+        if (ssp.dwCurrentState == SERVICE_STOPPED)
+            break;
+
+        if (GetTickCount() - dwStartTime > dwTimeout)
+        {
+            CloseServiceHandle(schService);
+            CloseServiceHandle(schSCManager);
+            return E_FAIL;
+        }
+    }
+
+    CloseServiceHandle(schService);
+    CloseServiceHandle(schSCManager);
+
+    return S_OK;
+}
+
+
 
 STDMETHODIMP CServiceManager::get_ServiceName(BSTR* pVal)
 {
@@ -220,3 +330,96 @@ STDMETHODIMP CServiceManager::get_WaitHint(INT* pVal)
 }
 
 
+BOOL CServiceManager::StopDependentServices() {
+    DWORD i;
+    DWORD dwBytesNeeded;
+    DWORD dwCount;
+
+    LPENUM_SERVICE_STATUS   lpDependencies = NULL;
+    ENUM_SERVICE_STATUS     ess;
+    SC_HANDLE               hDepService;
+    SERVICE_STATUS_PROCESS  ssp;
+
+    DWORD dwStartTime = GetTickCount();
+    DWORD dwTimeout = 30000; // 30-second time-out
+
+    // Pass a zero-length buffer to get the required buffer size.
+    if (EnumDependentServices(schService, SERVICE_ACTIVE,
+        lpDependencies, 0, &dwBytesNeeded, &dwCount))
+    {
+        // If the Enum call succeeds, then there are no dependent
+        // services, so do nothing.
+        return TRUE;
+    }
+    else
+    {
+        if (GetLastError() != ERROR_MORE_DATA)
+            return FALSE; // Unexpected error
+
+        // Allocate a buffer for the dependencies.
+        lpDependencies = (LPENUM_SERVICE_STATUS)HeapAlloc(
+            GetProcessHeap(), HEAP_ZERO_MEMORY, dwBytesNeeded);
+
+        if (!lpDependencies)
+            return FALSE;
+
+        __try {
+            // Enumerate the dependencies.
+            if (!EnumDependentServices(schService, SERVICE_ACTIVE,
+                lpDependencies, dwBytesNeeded, &dwBytesNeeded,
+                &dwCount))
+                return FALSE;
+
+            for (i = 0; i < dwCount; i++)
+            {
+                ess = *(lpDependencies + i);
+                // Open the service.
+                hDepService = OpenService(schSCManager,
+                    ess.lpServiceName,
+                    SERVICE_STOP | SERVICE_QUERY_STATUS);
+
+                if (!hDepService)
+                    return FALSE;
+
+                __try {
+                    // Send a stop code.
+                    if (!ControlService(hDepService,
+                        SERVICE_CONTROL_STOP,
+                        (LPSERVICE_STATUS)&ssp))
+                        return FALSE;
+
+                    // Wait for the service to stop.
+                    while (ssp.dwCurrentState != SERVICE_STOPPED)
+                    {
+                        Sleep(ssp.dwWaitHint);
+                        if (!QueryServiceStatusEx(
+                            hDepService,
+                            SC_STATUS_PROCESS_INFO,
+                            (LPBYTE)&ssp,
+                            sizeof(SERVICE_STATUS_PROCESS),
+                            &dwBytesNeeded))
+                            return FALSE;
+
+                        if (ssp.dwCurrentState == SERVICE_STOPPED)
+                            break;
+
+                        if (GetTickCount() - dwStartTime > dwTimeout)
+                            return FALSE;
+                    }
+                }
+                __finally
+                {
+                    // Always release the service handle.
+                    CloseServiceHandle(hDepService);
+                }
+            }
+        }
+        __finally
+        {
+            // Always free the enumeration buffer.
+            HeapFree(GetProcessHeap(), 0, lpDependencies);
+        }
+    }
+    return TRUE;
+
+}

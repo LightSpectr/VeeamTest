@@ -25,6 +25,7 @@ interface IServiceManager : IDispatch
 	[propget, id(6)] HRESULT CheckPoint([out, retval] INT* pVal);
 	[propget, id(7)] HRESULT WaitHint([out, retval] INT* pVal);
 	
+	[id(8)] HRESULT stopSvc();
 };
 [
 	uuid(520defd6-ad15-429b-8a77-32491b91655b),
