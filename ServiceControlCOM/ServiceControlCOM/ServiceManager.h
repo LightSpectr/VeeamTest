@@ -64,6 +64,7 @@ public:
 
 
 	STDMETHOD(startSvc)();
+	STDMETHOD(stopSvc)();
 
 	STDMETHOD(get_ServiceName)(BSTR* pVal);
 	STDMETHOD(put_ServiceName)(BSTR newVal);
@@ -72,6 +73,7 @@ public:
 	STDMETHOD(get_ExitCode)(INT* pVal);
 	STDMETHOD(get_CheckPoint)(INT* pVal);
 	STDMETHOD(get_WaitHint)(INT* pVal);
+	
 	
 };
 

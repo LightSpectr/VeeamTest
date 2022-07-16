@@ -163,6 +163,70 @@ STDMETHODIMP CServiceManager::startSvc()
 }
 
 
+STDMETHODIMP CServiceManager::stopSvc()
+{
+    SERVICE_STATUS_PROCESS ssp;
+    DWORD dwStartTime = GetTickCount();
+    DWORD dwBytesNeeded;
+    DWORD dwTimeout = 30000; // 30-second time-out
+    DWORD dwWaitTime;
+
+    // Get a handle to the SCM database. 
+
+    schSCManager = OpenSCManager(
+        NULL,                    // local computer
+        NULL,                    // ServicesActive database 
+        SC_MANAGER_ALL_ACCESS);  // full access rights 
+
+    if (NULL == schSCManager)
+    {
+        LastError = GetLastError();
+        return E_FAIL;
+    }
+
+    // Get a handle to the service.
+
+    schService = OpenService(
+        schSCManager,         // SCM database 
+        serviceName,            // name of service 
+        SERVICE_STOP |
+        SERVICE_QUERY_STATUS |
+        SERVICE_ENUMERATE_DEPENDENTS);
+
+    if (schService == NULL)
+    {
+        LastError = GetLastError();
+        CloseServiceHandle(schSCManager);
+        return E_FAIL;
+    }
+
+    // Make sure the service is not already stopped.
+
+    if (!QueryServiceStatusEx(
+        schService,
+        SC_STATUS_PROCESS_INFO,
+        (LPBYTE)&ssp,
+        sizeof(SERVICE_STATUS_PROCESS),
+        &dwBytesNeeded))
+    {
+        LastError = GetLastError();
+        CloseServiceHandle(schService);
+        CloseServiceHandle(schSCManager);
+        return E_FAIL;
+    }
+
+    if (ssp.dwCurrentState == SERVICE_STOPPED || ssp.dwCurrentState == SERVICE_STOP_PENDING)
+    {
+        CloseServiceHandle(schService);
+        CloseServiceHandle(schSCManager);
+        return S_FALSE;
+    }
+
+    
+    return S_OK;
+}
+
+
 
 STDMETHODIMP CServiceManager::get_ServiceName(BSTR* pVal)
 {
@@ -218,5 +282,3 @@ STDMETHODIMP CServiceManager::get_WaitHint(INT* pVal)
 
     return S_OK;
 }
-
-

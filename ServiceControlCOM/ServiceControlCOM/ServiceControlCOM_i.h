@@ -111,6 +111,8 @@ EXTERN_C const IID IID_IServiceManager;
         virtual /* [id][propget] */ HRESULT STDMETHODCALLTYPE get_WaitHint( 
             /* [retval][out] */ INT *pVal) = 0;
         
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE stopSvc( void) = 0;
+        
     };
     
     
@@ -200,6 +202,9 @@ EXTERN_C const IID IID_IServiceManager;
             IServiceManager * This,
             /* [retval][out] */ INT *pVal);
         
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *stopSvc )( 
+            IServiceManager * This);
+        
         END_INTERFACE
     } IServiceManagerVtbl;
 
@@ -259,6 +264,9 @@ EXTERN_C const IID IID_IServiceManager;
 
 #define IServiceManager_get_WaitHint(This,pVal)	\
     ( (This)->lpVtbl -> get_WaitHint(This,pVal) ) 
+
+#define IServiceManager_stopSvc(This)	\
+    ( (This)->lpVtbl -> stopSvc(This) ) 
 
 #endif /* COBJMACROS */
 
