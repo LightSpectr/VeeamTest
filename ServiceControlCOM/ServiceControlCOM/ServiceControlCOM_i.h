@@ -88,7 +88,7 @@ EXTERN_C const IID IID_IServiceManager;
     IServiceManager : public IDispatch
     {
     public:
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE startService( 
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE startSvc( 
             /* [out] */ INT *Error) = 0;
         
         virtual /* [id][propget] */ HRESULT STDMETHODCALLTYPE get_name( 
@@ -155,7 +155,7 @@ EXTERN_C const IID IID_IServiceManager;
             /* [annotation][out] */ 
             _Out_opt_  UINT *puArgErr);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *startService )( 
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *startSvc )( 
             IServiceManager * This,
             /* [out] */ INT *Error);
         
@@ -203,8 +203,8 @@ EXTERN_C const IID IID_IServiceManager;
     ( (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr) ) 
 
 
-#define IServiceManager_startService(This,Error)	\
-    ( (This)->lpVtbl -> startService(This,Error) ) 
+#define IServiceManager_startSvc(This,Error)	\
+    ( (This)->lpVtbl -> startSvc(This,Error) ) 
 
 #define IServiceManager_get_name(This,pVal)	\
     ( (This)->lpVtbl -> get_name(This,pVal) ) 

@@ -103,7 +103,7 @@ static const ServiceControlCOM_MIDL_PROC_FORMAT_STRING ServiceControlCOM__MIDL_P
         0,
         {
 
-	/* Procedure startService */
+	/* Procedure startSvc */
 
 			0x33,		/* FC_AUTO_HANDLE */
 			0x6c,		/* Old Flags:  object, Oi2 */
@@ -699,9 +699,9 @@ static const __midl_frag3_t __midl_frag3 =
 
 static const __midl_frag2_t __midl_frag2 =
 { 
-/* startService */
+/* startSvc */
     { 
-    /* startService */      /* procedure startService */
+    /* startSvc */      /* procedure startSvc */
         (NDR64_UINT32) 524611 /* 0x80143 */,    /* auto handle */ /* IsIntrepreted, [object], HasReturn */
         (NDR64_UINT32) 24 /* 0x18 */ ,  /* Stack size */
         (NDR64_UINT32) 0 /* 0x0 */,
@@ -864,7 +864,7 @@ CINTERFACE_PROXY_VTABLE(10) _IServiceManagerProxyVtbl =
     0 /* IDispatch::GetTypeInfo */ ,
     0 /* IDispatch::GetIDsOfNames */ ,
     0 /* IDispatch_Invoke_Proxy */ ,
-    (void *) (INT_PTR) -1 /* IServiceManager::startService */ ,
+    (void *) (INT_PTR) -1 /* IServiceManager::startSvc */ ,
     (void *) (INT_PTR) -1 /* IServiceManager::get_name */ ,
     (void *) (INT_PTR) -1 /* IServiceManager::put_name */
 };
