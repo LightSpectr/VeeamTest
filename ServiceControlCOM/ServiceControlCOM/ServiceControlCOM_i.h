@@ -88,14 +88,28 @@ EXTERN_C const IID IID_IServiceManager;
     IServiceManager : public IDispatch
     {
     public:
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE startSvc( 
-            /* [out] */ INT *Error) = 0;
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE startSvc( void) = 0;
         
-        virtual /* [id][propget] */ HRESULT STDMETHODCALLTYPE get_name( 
+        virtual /* [id][propget] */ HRESULT STDMETHODCALLTYPE get_ServiceName( 
             /* [retval][out] */ BSTR *pVal) = 0;
         
-        virtual /* [id][propput] */ HRESULT STDMETHODCALLTYPE put_name( 
+        virtual /* [id][propput] */ HRESULT STDMETHODCALLTYPE put_ServiceName( 
             /* [in] */ BSTR newVal) = 0;
+        
+        virtual /* [id][propget] */ HRESULT STDMETHODCALLTYPE get_LastError( 
+            /* [retval][out] */ INT *pVal) = 0;
+        
+        virtual /* [id][propget] */ HRESULT STDMETHODCALLTYPE get_CurrentState( 
+            /* [retval][out] */ INT *pVal) = 0;
+        
+        virtual /* [id][propget] */ HRESULT STDMETHODCALLTYPE get_ExitCode( 
+            /* [retval][out] */ INT *pVal) = 0;
+        
+        virtual /* [id][propget] */ HRESULT STDMETHODCALLTYPE get_CheckPoint( 
+            /* [retval][out] */ INT *pVal) = 0;
+        
+        virtual /* [id][propget] */ HRESULT STDMETHODCALLTYPE get_WaitHint( 
+            /* [retval][out] */ INT *pVal) = 0;
         
     };
     
@@ -156,16 +170,35 @@ EXTERN_C const IID IID_IServiceManager;
             _Out_opt_  UINT *puArgErr);
         
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *startSvc )( 
-            IServiceManager * This,
-            /* [out] */ INT *Error);
+            IServiceManager * This);
         
-        /* [id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_name )( 
+        /* [id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_ServiceName )( 
             IServiceManager * This,
             /* [retval][out] */ BSTR *pVal);
         
-        /* [id][propput] */ HRESULT ( STDMETHODCALLTYPE *put_name )( 
+        /* [id][propput] */ HRESULT ( STDMETHODCALLTYPE *put_ServiceName )( 
             IServiceManager * This,
             /* [in] */ BSTR newVal);
+        
+        /* [id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_LastError )( 
+            IServiceManager * This,
+            /* [retval][out] */ INT *pVal);
+        
+        /* [id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_CurrentState )( 
+            IServiceManager * This,
+            /* [retval][out] */ INT *pVal);
+        
+        /* [id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_ExitCode )( 
+            IServiceManager * This,
+            /* [retval][out] */ INT *pVal);
+        
+        /* [id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_CheckPoint )( 
+            IServiceManager * This,
+            /* [retval][out] */ INT *pVal);
+        
+        /* [id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_WaitHint )( 
+            IServiceManager * This,
+            /* [retval][out] */ INT *pVal);
         
         END_INTERFACE
     } IServiceManagerVtbl;
@@ -203,14 +236,29 @@ EXTERN_C const IID IID_IServiceManager;
     ( (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr) ) 
 
 
-#define IServiceManager_startSvc(This,Error)	\
-    ( (This)->lpVtbl -> startSvc(This,Error) ) 
+#define IServiceManager_startSvc(This)	\
+    ( (This)->lpVtbl -> startSvc(This) ) 
 
-#define IServiceManager_get_name(This,pVal)	\
-    ( (This)->lpVtbl -> get_name(This,pVal) ) 
+#define IServiceManager_get_ServiceName(This,pVal)	\
+    ( (This)->lpVtbl -> get_ServiceName(This,pVal) ) 
 
-#define IServiceManager_put_name(This,newVal)	\
-    ( (This)->lpVtbl -> put_name(This,newVal) ) 
+#define IServiceManager_put_ServiceName(This,newVal)	\
+    ( (This)->lpVtbl -> put_ServiceName(This,newVal) ) 
+
+#define IServiceManager_get_LastError(This,pVal)	\
+    ( (This)->lpVtbl -> get_LastError(This,pVal) ) 
+
+#define IServiceManager_get_CurrentState(This,pVal)	\
+    ( (This)->lpVtbl -> get_CurrentState(This,pVal) ) 
+
+#define IServiceManager_get_ExitCode(This,pVal)	\
+    ( (This)->lpVtbl -> get_ExitCode(This,pVal) ) 
+
+#define IServiceManager_get_CheckPoint(This,pVal)	\
+    ( (This)->lpVtbl -> get_CheckPoint(This,pVal) ) 
+
+#define IServiceManager_get_WaitHint(This,pVal)	\
+    ( (This)->lpVtbl -> get_WaitHint(This,pVal) ) 
 
 #endif /* COBJMACROS */
 

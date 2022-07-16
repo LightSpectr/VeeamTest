@@ -54,15 +54,25 @@ private:
 	SC_HANDLE schSCManager;
 	SC_HANDLE schService;
 	CString serviceName;
-
+	INT LastError;
+	INT CurrentState;
+	INT ExitCode;
+	INT CheckPoint;
+	INT WaitHint;
 public:
 
 
 
-	STDMETHOD(startSvc)(INT* Error);
+	STDMETHOD(startSvc)();
 
-	STDMETHOD(get_name)(BSTR* pVal);
-	STDMETHOD(put_name)(BSTR newVal);
+	STDMETHOD(get_ServiceName)(BSTR* pVal);
+	STDMETHOD(put_ServiceName)(BSTR newVal);
+	STDMETHOD(get_LastError)(INT* pVal);
+	STDMETHOD(get_CurrentState)(INT* pVal);
+	STDMETHOD(get_ExitCode)(INT* pVal);
+	STDMETHOD(get_CheckPoint)(INT* pVal);
+	STDMETHOD(get_WaitHint)(INT* pVal);
+	
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(ServiceManager), CServiceManager)

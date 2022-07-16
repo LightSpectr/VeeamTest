@@ -8,9 +8,9 @@
 
 
 
-STDMETHODIMP CServiceManager::startSvc(INT* Error)
+STDMETHODIMP CServiceManager::startSvc()
 {
-    *Error = 0;
+    LastError = 0;
     SERVICE_STATUS_PROCESS ssStatus;
     DWORD dwOldCheckPoint;
     DWORD dwStartTickCount;
@@ -26,7 +26,7 @@ STDMETHODIMP CServiceManager::startSvc(INT* Error)
    
     if (NULL == schSCManager)
     {
-        *Error = GetLastError();
+        LastError = GetLastError();
         return E_FAIL;
     }
 
@@ -37,7 +37,7 @@ STDMETHODIMP CServiceManager::startSvc(INT* Error)
 
     if (schService == NULL)
     {
-        *Error = GetLastError();
+        LastError = GetLastError();
         CloseServiceHandle(schSCManager);
         return E_FAIL;
     }
@@ -51,22 +51,20 @@ STDMETHODIMP CServiceManager::startSvc(INT* Error)
         sizeof(SERVICE_STATUS_PROCESS), // size of structure
         &dwBytesNeeded))              // size needed if buffer is too small
     {
-        *Error = GetLastError();
+        LastError = GetLastError();
         CloseServiceHandle(schService);
         CloseServiceHandle(schSCManager);
         return E_FAIL;
     }
 
-    // Check if the service is already running. It would be possible 
-    // to stop the service here, but for simplicity this example just returns. 
+    // Check if the service is already running. 
 
     if (ssStatus.dwCurrentState != SERVICE_STOPPED && ssStatus.dwCurrentState != SERVICE_STOP_PENDING)
     {
         CloseServiceHandle(schService);
         CloseServiceHandle(schSCManager);
-        return E_ABORT;
+        return S_FALSE;
     }
-
 
    
     if (!StartService(
@@ -74,7 +72,7 @@ STDMETHODIMP CServiceManager::startSvc(INT* Error)
         0,           // number of arguments 
         NULL))      // no arguments 
     {
-        *Error = GetLastError();
+        LastError = GetLastError();
         CloseServiceHandle(schService);
         CloseServiceHandle(schSCManager);
         return E_FAIL;
@@ -89,7 +87,7 @@ STDMETHODIMP CServiceManager::startSvc(INT* Error)
         sizeof(SERVICE_STATUS_PROCESS), // size of structure
         &dwBytesNeeded))              // if buffer too small
     {
-        *Error = GetLastError();
+        LastError = GetLastError();
         CloseServiceHandle(schService);
         CloseServiceHandle(schSCManager);
         return E_FAIL;
@@ -124,7 +122,7 @@ STDMETHODIMP CServiceManager::startSvc(INT* Error)
             sizeof(SERVICE_STATUS_PROCESS), // size of structure
             &dwBytesNeeded))              // if buffer too small
         {
-            *Error = GetLastError();
+            LastError = GetLastError();
             break;
         }
 
@@ -145,7 +143,11 @@ STDMETHODIMP CServiceManager::startSvc(INT* Error)
         }
     }
 
-    // Determine whether the service is running.
+    CurrentState = ssStatus.dwCurrentState;
+    ExitCode = ssStatus.dwWin32ExitCode;
+    CheckPoint = ssStatus.dwCheckPoint;
+    WaitHint = ssStatus.dwWaitHint;
+   
     CloseServiceHandle(schService);
     CloseServiceHandle(schSCManager);
 
@@ -155,24 +157,14 @@ STDMETHODIMP CServiceManager::startSvc(INT* Error)
     }
     else
     {
-        return S_FALSE;
-        /*
-        printf("Service not started. \n");
-        printf("  Current State: %d\n", ssStatus.dwCurrentState);
-        printf("  Exit Code: %d\n", ssStatus.dwWin32ExitCode);
-        printf("  Check Point: %d\n", ssStatus.dwCheckPoint);
-        printf("  Wait Hint: %d\n", ssStatus.dwWaitHint);
-        */
+        return E_ABORT;
     }
 
-  
-    
-    
 }
 
 
 
-STDMETHODIMP CServiceManager::get_name(BSTR* pVal)
+STDMETHODIMP CServiceManager::get_ServiceName(BSTR* pVal)
 {
     *pVal = serviceName.AllocSysString();
 
@@ -180,9 +172,51 @@ STDMETHODIMP CServiceManager::get_name(BSTR* pVal)
 }
 
 
-STDMETHODIMP CServiceManager::put_name(BSTR newVal)
+STDMETHODIMP CServiceManager::put_ServiceName(BSTR newVal)
 {
     serviceName = newVal;
 
     return S_OK;
 }
+
+
+STDMETHODIMP CServiceManager::get_LastError(INT* pVal)
+{
+    *pVal = LastError;
+
+    return S_OK;
+}
+
+
+STDMETHODIMP CServiceManager::get_CurrentState(INT* pVal)
+{
+    *pVal = CurrentState;
+
+    return S_OK;
+}
+
+
+STDMETHODIMP CServiceManager::get_ExitCode(INT* pVal)
+{
+    *pVal = ExitCode;
+
+    return S_OK;
+}
+
+
+STDMETHODIMP CServiceManager::get_CheckPoint(INT* pVal)
+{
+    *pVal = CheckPoint;
+
+    return S_OK;
+}
+
+
+STDMETHODIMP CServiceManager::get_WaitHint(INT* pVal)
+{
+    *pVal = WaitHint;
+
+    return S_OK;
+}
+
+
