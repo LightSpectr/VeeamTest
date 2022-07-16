@@ -59,6 +59,7 @@ private:
 	INT ExitCode;
 	INT CheckPoint;
 	INT WaitHint;
+	BOOL StopDependentServices();
 public:
 
 
