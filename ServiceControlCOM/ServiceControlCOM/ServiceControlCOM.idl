@@ -15,7 +15,16 @@ import "ocidl.idl";
 	pointer_default(unique)
 ]
 interface IServiceManager : IDispatch
-{
+{	
+	[id(1)] HRESULT startSvc();
+	[propget, id(2)] HRESULT ServiceName([out, retval] BSTR* pVal);
+	[propput, id(2)] HRESULT ServiceName([in] BSTR newVal);
+	[propget, id(3)] HRESULT LastError([out, retval] INT* pVal);
+	[propget, id(4)] HRESULT CurrentState([out, retval] INT* pVal);
+	[propget, id(5)] HRESULT ExitCode([out, retval] INT* pVal);
+	[propget, id(6)] HRESULT CheckPoint([out, retval] INT* pVal);
+	[propget, id(7)] HRESULT WaitHint([out, retval] INT* pVal);
+	
 };
 [
 	uuid(520defd6-ad15-429b-8a77-32491b91655b),
