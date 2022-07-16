@@ -16,7 +16,9 @@ import "ocidl.idl";
 ]
 interface IServiceManager : IDispatch
 {
-	[id(1)] HRESULT StartService([in] TCHAR* SvcName);
+	[id(1)] HRESULT startSvc([out] INT* Error);
+	[propget, id(2)] HRESULT name([out, retval] BSTR* pVal);
+	[propput, id(2)] HRESULT name([in] BSTR newVal);
 };
 [
 	uuid(520defd6-ad15-429b-8a77-32491b91655b),

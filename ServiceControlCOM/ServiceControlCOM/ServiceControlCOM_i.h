@@ -88,8 +88,14 @@ EXTERN_C const IID IID_IServiceManager;
     IServiceManager : public IDispatch
     {
     public:
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE StartService( 
-            /* [in] */ TCHAR *SvcName) = 0;
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE startService( 
+            /* [out] */ INT *Error) = 0;
+        
+        virtual /* [id][propget] */ HRESULT STDMETHODCALLTYPE get_name( 
+            /* [retval][out] */ BSTR *pVal) = 0;
+        
+        virtual /* [id][propput] */ HRESULT STDMETHODCALLTYPE put_name( 
+            /* [in] */ BSTR newVal) = 0;
         
     };
     
@@ -149,9 +155,17 @@ EXTERN_C const IID IID_IServiceManager;
             /* [annotation][out] */ 
             _Out_opt_  UINT *puArgErr);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *StartService )( 
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *startService )( 
             IServiceManager * This,
-            /* [in] */ TCHAR *SvcName);
+            /* [out] */ INT *Error);
+        
+        /* [id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_name )( 
+            IServiceManager * This,
+            /* [retval][out] */ BSTR *pVal);
+        
+        /* [id][propput] */ HRESULT ( STDMETHODCALLTYPE *put_name )( 
+            IServiceManager * This,
+            /* [in] */ BSTR newVal);
         
         END_INTERFACE
     } IServiceManagerVtbl;
@@ -189,8 +203,14 @@ EXTERN_C const IID IID_IServiceManager;
     ( (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr) ) 
 
 
-#define IServiceManager_StartService(This,SvcName)	\
-    ( (This)->lpVtbl -> StartService(This,SvcName) ) 
+#define IServiceManager_startService(This,Error)	\
+    ( (This)->lpVtbl -> startService(This,Error) ) 
+
+#define IServiceManager_get_name(This,pVal)	\
+    ( (This)->lpVtbl -> get_name(This,pVal) ) 
+
+#define IServiceManager_put_name(This,newVal)	\
+    ( (This)->lpVtbl -> put_name(This,newVal) ) 
 
 #endif /* COBJMACROS */
 
@@ -223,6 +243,16 @@ ServiceManager;
 #endif /* __ServiceControlCOMLib_LIBRARY_DEFINED__ */
 
 /* Additional Prototypes for ALL interfaces */
+
+unsigned long             __RPC_USER  BSTR_UserSize(     unsigned long *, unsigned long            , BSTR * ); 
+unsigned char * __RPC_USER  BSTR_UserMarshal(  unsigned long *, unsigned char *, BSTR * ); 
+unsigned char * __RPC_USER  BSTR_UserUnmarshal(unsigned long *, unsigned char *, BSTR * ); 
+void                      __RPC_USER  BSTR_UserFree(     unsigned long *, BSTR * ); 
+
+unsigned long             __RPC_USER  BSTR_UserSize64(     unsigned long *, unsigned long            , BSTR * ); 
+unsigned char * __RPC_USER  BSTR_UserMarshal64(  unsigned long *, unsigned char *, BSTR * ); 
+unsigned char * __RPC_USER  BSTR_UserUnmarshal64(unsigned long *, unsigned char *, BSTR * ); 
+void                      __RPC_USER  BSTR_UserFree64(     unsigned long *, BSTR * ); 
 
 /* end of Additional Prototypes */
 

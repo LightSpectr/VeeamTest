@@ -3,7 +3,8 @@
 #pragma once
 #include "resource.h"       // основные символы
 #include <tchar.h>
-
+#include <windows.h>
+#include <atlstr.h>
 
 #include "ServiceControlCOM_i.h"
 
@@ -49,13 +50,19 @@ END_COM_MAP()
 	{
 	}
 
+private:
+	SC_HANDLE schSCManager;
+	SC_HANDLE schService;
+	CString serviceName;
+
 public:
 
 
 
-	STDMETHOD(StartService)(TCHAR* SvcName);
-private:
-	SC_HANDLE schSCManager;
+	STDMETHOD(startSvc)(INT* Error);
+
+	STDMETHOD(get_name)(BSTR* pVal);
+	STDMETHOD(put_name)(BSTR newVal);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(ServiceManager), CServiceManager)
