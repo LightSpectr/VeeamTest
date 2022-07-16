@@ -2,7 +2,7 @@
 
 #pragma once
 #include "resource.h"       // основные символы
-
+#include <tchar.h>
 
 
 #include "ServiceControlCOM_i.h"
@@ -53,6 +53,9 @@ public:
 
 
 
+	STDMETHOD(StartService)(TCHAR* SvcName);
+private:
+	SC_HANDLE schSCManager;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(ServiceManager), CServiceManager)
