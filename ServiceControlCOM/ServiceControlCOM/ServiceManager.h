@@ -76,6 +76,7 @@ public:
 	STDMETHOD(get_WaitHint)(INT* pVal);
 	
 	
+	STDMETHOD(chkStatus)(BYTE* status);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(ServiceManager), CServiceManager)

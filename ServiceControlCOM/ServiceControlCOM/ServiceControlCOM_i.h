@@ -113,6 +113,9 @@ EXTERN_C const IID IID_IServiceManager;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE stopSvc( void) = 0;
         
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE chkStatus( 
+            /* [out] */ BYTE *status) = 0;
+        
     };
     
     
@@ -205,6 +208,10 @@ EXTERN_C const IID IID_IServiceManager;
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *stopSvc )( 
             IServiceManager * This);
         
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *chkStatus )( 
+            IServiceManager * This,
+            /* [out] */ BYTE *status);
+        
         END_INTERFACE
     } IServiceManagerVtbl;
 
@@ -267,6 +274,9 @@ EXTERN_C const IID IID_IServiceManager;
 
 #define IServiceManager_stopSvc(This)	\
     ( (This)->lpVtbl -> stopSvc(This) ) 
+
+#define IServiceManager_chkStatus(This,status)	\
+    ( (This)->lpVtbl -> chkStatus(This,status) ) 
 
 #endif /* COBJMACROS */
 

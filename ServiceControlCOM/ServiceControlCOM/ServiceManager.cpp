@@ -165,6 +165,7 @@ STDMETHODIMP CServiceManager::startSvc()
 
 STDMETHODIMP CServiceManager::stopSvc()
 {
+    LastError = 0;
     SERVICE_STATUS_PROCESS ssp;
     DWORD dwStartTime = GetTickCount();
     DWORD dwBytesNeeded;
@@ -422,4 +423,80 @@ BOOL CServiceManager::StopDependentServices() {
     }
     return TRUE;
 
+}
+
+
+STDMETHODIMP CServiceManager::chkStatus(BYTE* status)
+{
+    *status = -1;
+    LastError = 0;
+    SERVICE_STATUS_PROCESS ssStatus;
+    DWORD dwBytesNeeded;
+
+    schSCManager = OpenSCManager(
+        NULL,                    // local computer
+        NULL,                    // servicesActive database 
+        SC_MANAGER_ALL_ACCESS);  // full access rights 
+
+    if (NULL == schSCManager)
+    {
+        LastError = GetLastError();
+        return E_FAIL;
+    }
+
+    schService = OpenService(
+        schSCManager,         // SCM database 
+        serviceName,            // name of service 
+        SERVICE_ALL_ACCESS);  // full access 
+
+    if (schService == NULL)
+    {
+        LastError = GetLastError();
+        CloseServiceHandle(schSCManager);
+        return E_FAIL;
+    }
+
+    // Check the status in case the service is not stopped. 
+
+    if (!QueryServiceStatusEx(
+        schService,                     // handle to service 
+        SC_STATUS_PROCESS_INFO,         // information level
+        (LPBYTE)&ssStatus,             // address of structure
+        sizeof(SERVICE_STATUS_PROCESS), // size of structure
+        &dwBytesNeeded))              // size needed if buffer is too small
+    {
+        LastError = GetLastError();
+        CloseServiceHandle(schService);
+        CloseServiceHandle(schSCManager);
+        return E_FAIL;
+    }
+
+    
+    switch (ssStatus.dwCurrentState) {
+        case SERVICE_STOPPED:
+
+            *status = 0;
+            break;
+        case SERVICE_STOP_PENDING:
+
+            *status = 1;
+            break;
+        case SERVICE_RUNNING:
+
+            *status = 2;
+            break;
+        case SERVICE_START_PENDING:
+
+            *status = 3;
+            break;
+
+        default:
+            *status = -1;
+            break;
+    }
+
+    
+    CloseServiceHandle(schService);
+    CloseServiceHandle(schSCManager);
+    return S_OK;
 }
