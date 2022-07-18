@@ -37,6 +37,7 @@
             this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.UpdateButton = new System.Windows.Forms.Button();
+            this.infoButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -129,6 +130,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.infoButton);
             this.splitContainer1.Panel1.Controls.Add(this.UpdateButton);
             this.splitContainer1.Panel1.Controls.Add(this.StartButton);
             this.splitContainer1.Panel1.Controls.Add(this.ReloadButton);
@@ -150,6 +152,17 @@
             this.UpdateButton.Text = "Обновить";
             this.UpdateButton.UseVisualStyleBackColor = true;
             this.UpdateButton.Click += new System.EventHandler(this.UpdateButton_Click);
+            // 
+            // infoButton
+            // 
+            this.infoButton.Enabled = false;
+            this.infoButton.Location = new System.Drawing.Point(12, 132);
+            this.infoButton.Name = "infoButton";
+            this.infoButton.Size = new System.Drawing.Size(100, 52);
+            this.infoButton.TabIndex = 6;
+            this.infoButton.Text = "Данные о службе";
+            this.infoButton.UseVisualStyleBackColor = true;
+            this.infoButton.Click += new System.EventHandler(this.infoButton_Click);
             // 
             // MainForm
             // 
@@ -180,5 +193,6 @@
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private DataGridViewTextBoxColumn SysServiceName;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
+        private Button infoButton;
     }
 }

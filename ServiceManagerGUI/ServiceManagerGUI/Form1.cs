@@ -145,6 +145,24 @@ namespace ServiceManagerGUI
             updateButtons();
         }
 
+        private void infoButton_Click(object sender, EventArgs e)
+        {
+            byte status;
+            try
+            {
+                serviceManager.ServiceName = dataGridView1.SelectedRows[0].Cells[1].Value.ToString();
+                serviceManager.chkStatus(out status);
+                string msg = "Данные о службе:\nCurrentState: " + serviceManager.CurrentState + "\nExitCode: " + serviceManager.ExitCode +
+                       "\nCheckPoint: " + serviceManager.CheckPoint + "\nWaitHint: " + serviceManager.WaitHint;
+                MessageBox.Show(msg);
+            }
+            catch (COMException comEx)
+            {
+                errorToMessage(comEx);
+            }
+
+        }
+
         private string statusToString(byte status)
         {
             switch (status)
@@ -167,6 +185,7 @@ namespace ServiceManagerGUI
                 StartButton.Enabled = false;
                 StopButton.Enabled = false;
                 ReloadButton.Enabled = false;
+                infoButton.Enabled = false;
             }
             else
             {
@@ -175,6 +194,7 @@ namespace ServiceManagerGUI
                     StartButton.Enabled = true;
                     StopButton.Enabled = false;
                     ReloadButton.Enabled = false;
+                    infoButton.Enabled = true;
 
                 }
                 else if (dataGridView1.SelectedRows[0].Cells[2].Value.ToString() == "Выполняется")
@@ -182,6 +202,7 @@ namespace ServiceManagerGUI
                     StartButton.Enabled = false;
                     StopButton.Enabled = true;
                     ReloadButton.Enabled = true;
+                    infoButton.Enabled = true;
                 }
             }
         }
@@ -210,5 +231,7 @@ namespace ServiceManagerGUI
 
             }
         }
+
+       
     }
 }
