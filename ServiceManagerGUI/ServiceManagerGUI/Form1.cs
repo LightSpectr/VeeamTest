@@ -20,6 +20,30 @@ namespace ServiceManagerGUI
 
         private void StartButton_Click(object sender, EventArgs e)
         {
+            StartButton.Enabled = false;
+            byte status = 100;
+            try
+            {
+                serviceManager.ServiceName = dataGridView1.SelectedRows[0].Cells[1].Value.ToString();
+                serviceManager.startSvc();
+                serviceManager.chkStatus(out status);
+            }
+            catch (COMException comEx)
+            {
+                switch ((uint)comEx.ErrorCode)
+                {
+                    case 0x80004004: //E_ABORT
+                        MessageBox.Show(Convert.ToString(serviceManager.CurrentState));
+                        break;
+
+                    case 0x80004005: //E_FAIL
+                        MessageBox.Show(Convert.ToString(serviceManager.LastError));
+                        break;
+
+                }
+            }
+            dataGridView1.SelectedRows[0].Cells[2].Value = statusToString(status);
+            updateButtons();
 
         }
 
@@ -48,7 +72,6 @@ namespace ServiceManagerGUI
             {
                 serviceManager.ServiceName = service.ServiceName;
                 byte status = 100;
-                string statusSting = "";
                 try
                 {
                     serviceManager.chkStatus(out status);
@@ -57,20 +80,7 @@ namespace ServiceManagerGUI
                 {
                     status = 100;
                 }
-                switch (status)
-                {
-                    case 100: statusSting = "Ошибка"; 
-                        break;
-
-                    case 0: statusSting = "Остановлен";
-                        break;
-
-                    case 2:
-                        statusSting = "Выполняется";
-                        break;
-
-                }
-                dataGridView1.Rows.Add(service.DisplayName, serviceManager.ServiceName, statusSting);
+                dataGridView1.Rows.Add(service.DisplayName, serviceManager.ServiceName, statusToString(status));
               
             }
        
@@ -78,6 +88,27 @@ namespace ServiceManagerGUI
         }
 
         private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        {
+
+            updateButtons();
+        }
+
+        private string statusToString(byte status)
+        {
+            switch (status)
+            {
+
+                case 0:
+                    return "Остановлен";  
+
+                case 2:
+                    return "Выполняется";
+
+            }
+
+            return "Ошибка";
+        }
+        private void updateButtons()
         {
             if (dataGridView1.SelectedRows.Count == 0)
             {
@@ -101,7 +132,6 @@ namespace ServiceManagerGUI
                     ReloadButton.Enabled = true;
                 }
             }
-            
         }
     }
 }
