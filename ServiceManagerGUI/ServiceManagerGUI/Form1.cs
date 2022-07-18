@@ -188,14 +188,24 @@ namespace ServiceManagerGUI
 
         private void errorToMessage(COMException comEx)
         {
+            string msg;
             switch ((uint)comEx.ErrorCode)
             {
                 case 0x80004004: //E_ABORT
-                    MessageBox.Show(Convert.ToString(serviceManager.CurrentState));
+                    msg = "Не получилось запусть службу, данные службы:\nCurrentState: " + serviceManager.CurrentState + "\nExitCode: " + serviceManager.ExitCode +
+                        "\nCheckPoint: " + serviceManager.CheckPoint + "\nWaitHint: " + serviceManager.WaitHint;
+                    MessageBox.Show(msg, 
+                        "Ошибка",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
                     break;
 
                 case 0x80004005: //E_FAIL
-                    MessageBox.Show(Convert.ToString(serviceManager.LastError));
+                    msg = "Код ошибки: " + serviceManager.LastError;
+                    MessageBox.Show(msg,
+                        "Ошибка",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
                     break;
 
             }
