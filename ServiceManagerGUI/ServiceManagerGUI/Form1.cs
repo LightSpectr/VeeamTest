@@ -116,26 +116,25 @@ namespace ServiceManagerGUI
             dataGridView1.Refresh();
             UpdateService();
         }
-        
+
         private void UpdateService()
         {
-            ServiceController[] services = ServiceController.GetServices(); ;
-            foreach (ServiceController service in services)
+            ServiceController[] services = ServiceController.GetServices();
+            try
             {
-                serviceManager.ServiceName = service.ServiceName;
-                byte status = 100;
-                try
+                foreach (ServiceController service in services)
                 {
+                    serviceManager.ServiceName = service.ServiceName;
+                    byte status = 100;
                     serviceManager.chkStatus(out status);
+                    dataGridView1.Rows.Add(service.DisplayName, serviceManager.ServiceName, statusToString(status));
+
                 }
-                catch (COMException comEx)
-                {
-                    errorToMessage(comEx);
-                }
-                dataGridView1.Rows.Add(service.DisplayName, serviceManager.ServiceName, statusToString(status));
-              
             }
-       
+            catch (COMException comEx)
+            {
+                errorToMessage(comEx);
+            }
 
         }
 
