@@ -1,4 +1,5 @@
 using Microsoft.Win32;
+using System.Security.Principal;
 namespace ServiceManagerGUI
 {
     internal static class Program
@@ -25,9 +26,29 @@ namespace ServiceManagerGUI
             }
             else
             {
-                ApplicationConfiguration.Initialize();
 
-                Application.Run(new MainForm());
+                bool isElevated;
+                using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+                {
+                    WindowsPrincipal principal = new WindowsPrincipal(identity);
+                    isElevated = principal.IsInRole(WindowsBuiltInRole.Administrator);
+                }
+                if (isElevated)
+                {
+                    ApplicationConfiguration.Initialize();
+                    Application.Run(new MainForm());
+                }
+                else
+                {
+                    string message = "У программы нет прав администратора";
+                    MessageBox.Show(
+                        message,
+                        "Ошибка",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    );
+                }
+                
             }
         }
     }
