@@ -35,6 +35,7 @@ namespace ServiceManagerGUI
 
         private void UpdateButton_Click(object sender, EventArgs e)
         {
+           
             dataGridView1.Rows.Clear();
             dataGridView1.Refresh();
             UpdateService();
@@ -61,7 +62,7 @@ namespace ServiceManagerGUI
                     case 100: statusSting = "Ошибка"; 
                         break;
 
-                    case 0: statusSting = "Остановлено";
+                    case 0: statusSting = "Остановлен";
                         break;
 
                     case 2:
@@ -69,21 +70,38 @@ namespace ServiceManagerGUI
                         break;
 
                 }
-                dataGridView1.Rows.Add(service.DisplayName, statusSting);
+                dataGridView1.Rows.Add(service.DisplayName, serviceManager.ServiceName, statusSting);
               
             }
-            /*
-            DataTable sample = new DataTable(); //Sample Data
-            sample.Columns.Add("id", typeof(string));
-            sample.Columns.Add("name", typeof(string));
-            sample.Rows.Add("1", "apple");
-            sample.Rows.Add("2", "acer");
-            foreach (DataRow row in sample.Rows)
-            {
-                dataGridView1.Rows.Add(row["id"], row["name"]);
-            }
-            */
+       
 
+        }
+
+        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count == 0)
+            {
+                StartButton.Enabled = false;
+                StopButton.Enabled = false;
+                ReloadButton.Enabled = false;
+            }
+            else
+            {
+                if (dataGridView1.SelectedRows[0].Cells[2].Value.ToString() == "Остановлен")
+                {
+                    StartButton.Enabled = true;
+                    StopButton.Enabled = false;
+                    ReloadButton.Enabled = false;
+
+                }
+                else if (dataGridView1.SelectedRows[0].Cells[2].Value.ToString() == "Выполняется")
+                {
+                    StartButton.Enabled = false;
+                    StopButton.Enabled = true;
+                    ReloadButton.Enabled = true;
+                }
+            }
+            
         }
     }
 }
