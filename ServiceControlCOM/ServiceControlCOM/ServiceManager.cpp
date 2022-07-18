@@ -447,7 +447,7 @@ STDMETHODIMP CServiceManager::chkStatus(BYTE* status)
     schService = OpenService(
         schSCManager,         // SCM database 
         serviceName,            // name of service 
-        SERVICE_ALL_ACCESS);  // full access 
+        SERVICE_QUERY_STATUS);  // full access 
 
     if (schService == NULL)
     {
@@ -495,6 +495,10 @@ STDMETHODIMP CServiceManager::chkStatus(BYTE* status)
             break;
     }
 
+    CurrentState = ssStatus.dwCurrentState;
+    ExitCode = ssStatus.dwWin32ExitCode;
+    CheckPoint = ssStatus.dwCheckPoint;
+    WaitHint = ssStatus.dwWaitHint;
     
     CloseServiceHandle(schService);
     CloseServiceHandle(schSCManager);
