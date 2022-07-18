@@ -26,35 +26,87 @@ namespace ServiceManagerGUI
             {
                 serviceManager.ServiceName = dataGridView1.SelectedRows[0].Cells[1].Value.ToString();
                 serviceManager.startSvc();
+                
+                string msg = "Служба " + dataGridView1.SelectedRows[0].Cells[0].Value.ToString() + " запущена";
+                MessageBox.Show(msg);
+            }
+            catch (COMException comEx)
+            {
+                errorToMessage(comEx);
+            }
+            try
+            {
                 serviceManager.chkStatus(out status);
             }
             catch (COMException comEx)
             {
-                switch ((uint)comEx.ErrorCode)
-                {
-                    case 0x80004004: //E_ABORT
-                        MessageBox.Show(Convert.ToString(serviceManager.CurrentState));
-                        break;
-
-                    case 0x80004005: //E_FAIL
-                        MessageBox.Show(Convert.ToString(serviceManager.LastError));
-                        break;
-
-                }
+                errorToMessage(comEx);
             }
             dataGridView1.SelectedRows[0].Cells[2].Value = statusToString(status);
             updateButtons();
+            
 
         }
 
         private void StopButton_Click(object sender, EventArgs e)
         {
 
+            StopButton.Enabled = false;
+            ReloadButton.Enabled = false;
+            byte status = 100;
+            try
+            {
+                serviceManager.ServiceName = dataGridView1.SelectedRows[0].Cells[1].Value.ToString();
+                serviceManager.stopSvc();
+                
+                string msg = "Служба " + dataGridView1.SelectedRows[0].Cells[0].Value.ToString() + " остановлена";
+                MessageBox.Show(msg);
+            }
+            catch (COMException comEx)
+            {
+                errorToMessage(comEx);
+            }
+            try
+            {
+                serviceManager.chkStatus(out status);
+            }
+            catch (COMException comEx)
+            {
+                errorToMessage(comEx);
+            }
+            dataGridView1.SelectedRows[0].Cells[2].Value = statusToString(status);
+            updateButtons();
+            
+
         }
 
         private void ReloadButton_Click(object sender, EventArgs e)
         {
-
+             StopButton.Enabled = false;
+            ReloadButton.Enabled = false;
+            byte status = 100;
+            try
+            {
+                serviceManager.ServiceName = dataGridView1.SelectedRows[0].Cells[1].Value.ToString();
+                serviceManager.stopSvc();
+                serviceManager.startSvc();
+                string msg = "Служба " + dataGridView1.SelectedRows[0].Cells[0].Value.ToString() + " перезапущена";
+                MessageBox.Show(msg);
+            }
+            catch (COMException comEx)
+            {
+                errorToMessage(comEx);
+            }
+            try
+            {
+                serviceManager.chkStatus(out status);
+            }
+            catch (COMException comEx)
+            {
+                errorToMessage(comEx);
+            }
+            dataGridView1.SelectedRows[0].Cells[2].Value = statusToString(status);
+            updateButtons();
         }
 
         private void UpdateButton_Click(object sender, EventArgs e)
@@ -78,7 +130,7 @@ namespace ServiceManagerGUI
                 }
                 catch (COMException comEx)
                 {
-                    status = 100;
+                    errorToMessage(comEx);
                 }
                 dataGridView1.Rows.Add(service.DisplayName, serviceManager.ServiceName, statusToString(status));
               
@@ -131,6 +183,21 @@ namespace ServiceManagerGUI
                     StopButton.Enabled = true;
                     ReloadButton.Enabled = true;
                 }
+            }
+        }
+
+        private void errorToMessage(COMException comEx)
+        {
+            switch ((uint)comEx.ErrorCode)
+            {
+                case 0x80004004: //E_ABORT
+                    MessageBox.Show(Convert.ToString(serviceManager.CurrentState));
+                    break;
+
+                case 0x80004005: //E_FAIL
+                    MessageBox.Show(Convert.ToString(serviceManager.LastError));
+                    break;
+
             }
         }
     }
