@@ -508,12 +508,13 @@ STDMETHODIMP CServiceManager::chkStatus(BYTE* status)
 
 STDMETHODIMP CServiceManager::get_AllSvcNames(BSTR* pVal)
 {
-    
+    std::string str;
+    CString n;
     DWORD bytesNeeded = 0;
     DWORD numServices = 0;
     DWORD resumeHandle = 0;
-    BSTR  lol;
     SC_HANDLE hSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_ENUMERATE_SERVICE);
+
     if (!hSCManager)
     {
         LastError = GetLastError();
@@ -521,10 +522,6 @@ STDMETHODIMP CServiceManager::get_AllSvcNames(BSTR* pVal)
     }
 
     EnumServicesStatus(hSCManager, SERVICE_WIN32, SERVICE_STATE_ALL, NULL, 0, &bytesNeeded, &numServices, &resumeHandle);
-    /*if (GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
-        printf("Error 2");
-    }*/
-
     std::vector<BYTE> enumBuffer(bytesNeeded);
     LPENUM_SERVICE_STATUS pEnum = reinterpret_cast<LPENUM_SERVICE_STATUS>(enumBuffer.data());
 
@@ -533,12 +530,11 @@ STDMETHODIMP CServiceManager::get_AllSvcNames(BSTR* pVal)
         return E_FAIL;
     }
     
-    std::string str;
-    CString n;
     for (DWORD idx = 0; idx < numServices; ++idx)
     {
         str += utf8_encode(pEnum[idx].lpServiceName) + '\n';
     }
+
     n = str.c_str();
     CloseServiceHandle(hSCManager);
     *pVal = n.AllocSysString();
