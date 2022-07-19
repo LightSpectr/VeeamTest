@@ -7,7 +7,7 @@
 // CServiceManager
 
 
-
+// Метод для запуска службы имя которой сохранено в serviceName
 STDMETHODIMP CServiceManager::startSvc()
 {
     LastError = 0;
@@ -18,7 +18,7 @@ STDMETHODIMP CServiceManager::startSvc()
     DWORD dwBytesNeeded;
 
 
-
+     
     schSCManager = OpenSCManager(
         NULL,                    // local computer
         NULL,                    // servicesActive database 
@@ -42,7 +42,7 @@ STDMETHODIMP CServiceManager::startSvc()
         return E_FAIL;
     }
 
-    // Check the status in case the service is not stopped. 
+    // проверка статуса службы 
 
     if (!QueryServiceStatusEx(
         schService,                     // handle to service 
@@ -57,7 +57,7 @@ STDMETHODIMP CServiceManager::startSvc()
         return E_FAIL;
     }
 
-    // Check if the service is already running. 
+    // проверка что служба уже не запущена 
 
     if (ssStatus.dwCurrentState != SERVICE_STOPPED && ssStatus.dwCurrentState != SERVICE_STOP_PENDING)
     {
@@ -66,7 +66,7 @@ STDMETHODIMP CServiceManager::startSvc()
         return S_FALSE;
     }
 
-   
+    // старт службы
     if (!StartService(
         schService,  // handle to service 
         0,           // number of arguments 
@@ -78,7 +78,7 @@ STDMETHODIMP CServiceManager::startSvc()
         return E_FAIL;
     }
 
-    // Check the status until the service is no longer start pending. 
+    // ожидание старта и проверка что служба начала работу 
 
     if (!QueryServiceStatusEx(
         schService,                     // handle to service 
@@ -93,7 +93,7 @@ STDMETHODIMP CServiceManager::startSvc()
         return E_FAIL;
     }
 
-    // Save the tick count and initial checkpoint.
+  
 
     dwStartTickCount = GetTickCount();
     dwOldCheckPoint = ssStatus.dwCheckPoint;
@@ -143,6 +143,7 @@ STDMETHODIMP CServiceManager::startSvc()
         }
     }
 
+
     CurrentState = ssStatus.dwCurrentState;
     ExitCode = ssStatus.dwWin32ExitCode;
     CheckPoint = ssStatus.dwCheckPoint;
@@ -153,7 +154,7 @@ STDMETHODIMP CServiceManager::startSvc()
 
     if (ssStatus.dwCurrentState == SERVICE_RUNNING)
     {
-        return S_OK;
+        return S_OK; 
     }
     else
     {
@@ -162,7 +163,7 @@ STDMETHODIMP CServiceManager::startSvc()
 
 }
 
-
+// Метод остановки службы имя которой сохранено в serviceName
 STDMETHODIMP CServiceManager::stopSvc()
 {
     LastError = 0;
@@ -171,8 +172,6 @@ STDMETHODIMP CServiceManager::stopSvc()
     DWORD dwBytesNeeded;
     DWORD dwTimeout = 30000; // 30-second time-out
     DWORD dwWaitTime;
-
-    // Get a handle to the SCM database. 
 
     schSCManager = OpenSCManager(
         NULL,                    // local computer
@@ -185,7 +184,6 @@ STDMETHODIMP CServiceManager::stopSvc()
         return E_FAIL;
     }
 
-    // Get a handle to the service.
 
     schService = OpenService(
         schSCManager,         // SCM database 
@@ -201,7 +199,7 @@ STDMETHODIMP CServiceManager::stopSvc()
         return E_FAIL;
     }
 
-    // Make sure the service is not already stopped.
+    // проверка что служба уже не остановлена 
 
     if (!QueryServiceStatusEx(
         schService,
@@ -223,9 +221,10 @@ STDMETHODIMP CServiceManager::stopSvc()
         return S_FALSE;
     }
 
+    // остановка зависимых служб
     StopDependentServices();
 
-    // Send a stop code to the service.
+    // остановка службы 
 
     if (!ControlService(
         schService,
@@ -238,7 +237,7 @@ STDMETHODIMP CServiceManager::stopSvc()
         return E_FAIL;
     }
 
-    // Wait for the service to stop.
+    // ожидание остановки и проверка что служба закончила работу
 
     while (ssp.dwCurrentState != SERVICE_STOPPED)
     {
@@ -425,7 +424,7 @@ BOOL CServiceManager::StopDependentServices() {
 
 }
 
-
+// проверка статуа службы 
 STDMETHODIMP CServiceManager::chkStatus(BYTE* status)
 {
     *status = -1;
@@ -456,7 +455,7 @@ STDMETHODIMP CServiceManager::chkStatus(BYTE* status)
         return E_FAIL;
     }
 
-    // Check the status in case the service is not stopped. 
+    // запись статуса
 
     if (!QueryServiceStatusEx(
         schService,                     // handle to service 
@@ -471,7 +470,7 @@ STDMETHODIMP CServiceManager::chkStatus(BYTE* status)
         return E_FAIL;
     }
 
-    
+    // запись в переменую статус службы
     switch (ssStatus.dwCurrentState) {
         case SERVICE_STOPPED:
 
@@ -505,7 +504,7 @@ STDMETHODIMP CServiceManager::chkStatus(BYTE* status)
     return S_OK;
 }
 
-
+// запись всех имен служеб через символ конца строки 
 STDMETHODIMP CServiceManager::get_AllSvcNames(BSTR* pVal)
 {
     std::string str;
