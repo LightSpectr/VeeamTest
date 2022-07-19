@@ -1,6 +1,5 @@
 using ServiceControlCOMLib;
 using System.Runtime.InteropServices;
-using System.ServiceProcess;
 
 namespace ServiceManagerGUI
 {
