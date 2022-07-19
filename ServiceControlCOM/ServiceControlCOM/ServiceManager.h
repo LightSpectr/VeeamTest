@@ -5,7 +5,9 @@
 #include <tchar.h>
 #include <windows.h>
 #include <atlstr.h>
-
+#include <vector>
+#include <iostream>
+#include <iostream>
 #include "ServiceControlCOM_i.h"
 
 
@@ -60,6 +62,7 @@ private:
 	INT CheckPoint;
 	INT WaitHint;
 	BOOL StopDependentServices();
+	std::string utf8_encode(const std::wstring& wstr);
 public:
 
 
@@ -77,6 +80,8 @@ public:
 	
 	
 	STDMETHOD(chkStatus)(BYTE* status);
+	STDMETHOD(get_AllSvcNames)(BSTR* pVal);
+	
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(ServiceManager), CServiceManager)

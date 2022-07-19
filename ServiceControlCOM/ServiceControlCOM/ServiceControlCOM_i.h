@@ -116,6 +116,9 @@ EXTERN_C const IID IID_IServiceManager;
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE chkStatus( 
             /* [out] */ BYTE *status) = 0;
         
+        virtual /* [id][propget] */ HRESULT STDMETHODCALLTYPE get_AllSvcNames( 
+            /* [retval][out] */ BSTR *pVal) = 0;
+        
     };
     
     
@@ -212,6 +215,10 @@ EXTERN_C const IID IID_IServiceManager;
             IServiceManager * This,
             /* [out] */ BYTE *status);
         
+        /* [id][propget] */ HRESULT ( STDMETHODCALLTYPE *get_AllSvcNames )( 
+            IServiceManager * This,
+            /* [retval][out] */ BSTR *pVal);
+        
         END_INTERFACE
     } IServiceManagerVtbl;
 
@@ -277,6 +284,9 @@ EXTERN_C const IID IID_IServiceManager;
 
 #define IServiceManager_chkStatus(This,status)	\
     ( (This)->lpVtbl -> chkStatus(This,status) ) 
+
+#define IServiceManager_get_AllSvcNames(This,pVal)	\
+    ( (This)->lpVtbl -> get_AllSvcNames(This,pVal) ) 
 
 #endif /* COBJMACROS */
 

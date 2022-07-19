@@ -278,7 +278,7 @@ STDMETHODIMP CServiceManager::stopSvc()
 STDMETHODIMP CServiceManager::get_ServiceName(BSTR* pVal)
 {
     *pVal = serviceName.AllocSysString();
-
+    
     return S_OK;
 }
 
@@ -504,3 +504,54 @@ STDMETHODIMP CServiceManager::chkStatus(BYTE* status)
     CloseServiceHandle(schSCManager);
     return S_OK;
 }
+
+
+STDMETHODIMP CServiceManager::get_AllSvcNames(BSTR* pVal)
+{
+    
+    DWORD bytesNeeded = 0;
+    DWORD numServices = 0;
+    DWORD resumeHandle = 0;
+    BSTR  lol;
+    SC_HANDLE hSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_ENUMERATE_SERVICE);
+    if (!hSCManager)
+    {
+        LastError = GetLastError();
+        return E_FAIL;
+    }
+
+    EnumServicesStatus(hSCManager, SERVICE_WIN32, SERVICE_STATE_ALL, NULL, 0, &bytesNeeded, &numServices, &resumeHandle);
+    /*if (GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
+        printf("Error 2");
+    }*/
+
+    std::vector<BYTE> enumBuffer(bytesNeeded);
+    LPENUM_SERVICE_STATUS pEnum = reinterpret_cast<LPENUM_SERVICE_STATUS>(enumBuffer.data());
+
+    if (!EnumServicesStatus(hSCManager, SERVICE_WIN32, SERVICE_STATE_ALL, pEnum, bytesNeeded, &bytesNeeded, &numServices, &resumeHandle)) {
+        LastError = GetLastError();
+        return E_FAIL;
+    }
+    
+    std::string str;
+    CString n;
+    for (DWORD idx = 0; idx < numServices; ++idx)
+    {
+        str += utf8_encode(pEnum[idx].lpServiceName) + '\n';
+    }
+    n = str.c_str();
+    CloseServiceHandle(hSCManager);
+    *pVal = n.AllocSysString();
+
+    return S_OK;
+}
+
+std::string CServiceManager::utf8_encode(const std::wstring& wstr)
+{
+    if (wstr.empty()) return std::string();
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+    std::string strTo(size_needed, 0);
+    WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+    return strTo;
+}
+

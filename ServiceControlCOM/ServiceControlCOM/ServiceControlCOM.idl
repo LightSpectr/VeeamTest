@@ -27,6 +27,8 @@ interface IServiceManager : IDispatch
 	
 	[id(8)] HRESULT stopSvc();
 	[id(9)] HRESULT chkStatus([out] BYTE* status);
+	[propget, id(10)] HRESULT AllSvcNames([out, retval] BSTR* pVal);
+	
 };
 [
 	uuid(520defd6-ad15-429b-8a77-32491b91655b),
