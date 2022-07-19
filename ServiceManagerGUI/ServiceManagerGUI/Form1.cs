@@ -138,7 +138,7 @@ namespace ServiceManagerGUI
             {
                 errorToMessage(comEx);
             }
-
+            serviceManager.clearMem();
         }
 
         private void dataGridView1_SelectionChanged(object sender, EventArgs e)

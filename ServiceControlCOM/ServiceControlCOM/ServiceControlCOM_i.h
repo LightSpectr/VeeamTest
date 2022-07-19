@@ -119,6 +119,8 @@ EXTERN_C const IID IID_IServiceManager;
         virtual /* [id][propget] */ HRESULT STDMETHODCALLTYPE get_AllSvcNames( 
             /* [retval][out] */ BSTR *pVal) = 0;
         
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE clearMem( void) = 0;
+        
     };
     
     
@@ -219,6 +221,9 @@ EXTERN_C const IID IID_IServiceManager;
             IServiceManager * This,
             /* [retval][out] */ BSTR *pVal);
         
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *clearMem )( 
+            IServiceManager * This);
+        
         END_INTERFACE
     } IServiceManagerVtbl;
 
@@ -287,6 +292,9 @@ EXTERN_C const IID IID_IServiceManager;
 
 #define IServiceManager_get_AllSvcNames(This,pVal)	\
     ( (This)->lpVtbl -> get_AllSvcNames(This,pVal) ) 
+
+#define IServiceManager_clearMem(This)	\
+    ( (This)->lpVtbl -> clearMem(This) ) 
 
 #endif /* COBJMACROS */
 

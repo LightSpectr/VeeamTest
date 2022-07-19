@@ -276,7 +276,8 @@ STDMETHODIMP CServiceManager::stopSvc()
 
 STDMETHODIMP CServiceManager::get_ServiceName(BSTR* pVal)
 {
-    *pVal = serviceName.AllocSysString();
+    bstrMem = serviceName.AllocSysString();
+    *pVal = bstrMem;
     
     return S_OK;
 }
@@ -536,7 +537,8 @@ STDMETHODIMP CServiceManager::get_AllSvcNames(BSTR* pVal)
 
     n = str.c_str();
     CloseServiceHandle(hSCManager);
-    *pVal = n.AllocSysString();
+    bstrMem = n.AllocSysString();
+    *pVal = bstrMem;
 
     return S_OK;
 }
@@ -550,3 +552,11 @@ std::string CServiceManager::utf8_encode(const std::wstring& wstr)
     return strTo;
 }
 
+
+
+STDMETHODIMP CServiceManager::clearMem()
+{
+    SysFreeString(bstrMem);
+
+    return S_OK;
+}

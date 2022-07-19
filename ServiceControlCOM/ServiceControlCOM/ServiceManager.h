@@ -63,6 +63,7 @@ private:
 	INT WaitHint;
 	BOOL StopDependentServices();
 	std::string utf8_encode(const std::wstring& wstr);
+	BSTR bstrMem;
 public:
 
 
@@ -82,6 +83,7 @@ public:
 	STDMETHOD(chkStatus)(BYTE* status);
 	STDMETHOD(get_AllSvcNames)(BSTR* pVal);
 	
+	STDMETHOD(clearMem)();
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(ServiceManager), CServiceManager)
