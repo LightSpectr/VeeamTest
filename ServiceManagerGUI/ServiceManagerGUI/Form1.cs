@@ -24,7 +24,7 @@ namespace ServiceManagerGUI
             byte status = 100;
             try
             {
-                serviceManager.ServiceName = dataGridView1.SelectedRows[0].Cells[1].Value.ToString();
+                serviceManager.ServiceName = dataGridView1.SelectedRows[0].Cells[0].Value.ToString();
                 serviceManager.startSvc();
                 
                 string msg = "Служба " + dataGridView1.SelectedRows[0].Cells[0].Value.ToString() + " запущена";
@@ -42,7 +42,7 @@ namespace ServiceManagerGUI
             {
                 errorToMessage(comEx);
             }
-            dataGridView1.SelectedRows[0].Cells[2].Value = statusToString(status);
+            dataGridView1.SelectedRows[0].Cells[1].Value = statusToString(status);
             updateButtons();
             
 
@@ -56,7 +56,7 @@ namespace ServiceManagerGUI
             byte status = 100;
             try
             {
-                serviceManager.ServiceName = dataGridView1.SelectedRows[0].Cells[1].Value.ToString();
+                serviceManager.ServiceName = dataGridView1.SelectedRows[0].Cells[0].Value.ToString();
                 serviceManager.stopSvc();
                 
                 string msg = "Служба " + dataGridView1.SelectedRows[0].Cells[0].Value.ToString() + " остановлена";
@@ -74,9 +74,8 @@ namespace ServiceManagerGUI
             {
                 errorToMessage(comEx);
             }
-            dataGridView1.SelectedRows[0].Cells[2].Value = statusToString(status);
+            dataGridView1.SelectedRows[0].Cells[1].Value = statusToString(status);
             updateButtons();
-            
 
         }
 
@@ -87,7 +86,7 @@ namespace ServiceManagerGUI
             byte status = 100;
             try
             {
-                serviceManager.ServiceName = dataGridView1.SelectedRows[0].Cells[1].Value.ToString();
+                serviceManager.ServiceName = dataGridView1.SelectedRows[0].Cells[0].Value.ToString();
                 serviceManager.stopSvc();
                 serviceManager.startSvc();
                 string msg = "Служба " + dataGridView1.SelectedRows[0].Cells[0].Value.ToString() + " перезапущена";
@@ -105,7 +104,7 @@ namespace ServiceManagerGUI
             {
                 errorToMessage(comEx);
             }
-            dataGridView1.SelectedRows[0].Cells[2].Value = statusToString(status);
+            dataGridView1.SelectedRows[0].Cells[1].Value = statusToString(status);
             updateButtons();
         }
 
@@ -119,17 +118,22 @@ namespace ServiceManagerGUI
 
         private void UpdateService()
         {
-            ServiceController[] services = ServiceController.GetServices();
             try
             {
-                foreach (ServiceController service in services)
+                string[] services = serviceManager.AllSvcNames.Split('\n');
+               
+                foreach (string service in services)
                 {
-                    serviceManager.ServiceName = service.ServiceName;
-                    byte status = 100;
-                    serviceManager.chkStatus(out status);
-                    dataGridView1.Rows.Add(service.DisplayName, serviceManager.ServiceName, statusToString(status));
-
+                    if (service != "")
+                    {
+                        serviceManager.ServiceName = service;
+                        byte status = 100;
+                        serviceManager.chkStatus(out status);
+                        dataGridView1.Rows.Add(service, statusToString(status));
+                    }
+                   
                 }
+     
             }
             catch (COMException comEx)
             {
@@ -149,7 +153,7 @@ namespace ServiceManagerGUI
             byte status;
             try
             {
-                serviceManager.ServiceName = dataGridView1.SelectedRows[0].Cells[1].Value.ToString();
+                serviceManager.ServiceName = dataGridView1.SelectedRows[0].Cells[0].Value.ToString();
                 serviceManager.chkStatus(out status);
                 string msg = "Данные о службе:\nCurrentState: " + serviceManager.CurrentState + "\nExitCode: " + serviceManager.ExitCode +
                        "\nCheckPoint: " + serviceManager.CheckPoint + "\nWaitHint: " + serviceManager.WaitHint;
@@ -188,7 +192,7 @@ namespace ServiceManagerGUI
             }
             else
             {
-                if (dataGridView1.SelectedRows[0].Cells[2].Value.ToString() == "Остановлен")
+                if (dataGridView1.SelectedRows[0].Cells[1].Value.ToString() == "Остановлен")
                 {
                     StartButton.Enabled = true;
                     StopButton.Enabled = false;
@@ -196,7 +200,7 @@ namespace ServiceManagerGUI
                     infoButton.Enabled = true;
 
                 }
-                else if (dataGridView1.SelectedRows[0].Cells[2].Value.ToString() == "Выполняется")
+                else if (dataGridView1.SelectedRows[0].Cells[1].Value.ToString() == "Выполняется")
                 {
                     StartButton.Enabled = false;
                     StopButton.Enabled = true;
