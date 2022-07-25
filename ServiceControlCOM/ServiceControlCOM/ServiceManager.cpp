@@ -509,7 +509,7 @@ STDMETHODIMP CServiceManager::chkStatus(BYTE* status)
 STDMETHODIMP CServiceManager::get_AllSvcNames(BSTR* pVal)
 {
     std::string str;
-    CString n;
+    CString c_str;
     DWORD bytesNeeded = 0;
     DWORD numServices = 0;
     DWORD resumeHandle = 0;
@@ -530,14 +530,16 @@ STDMETHODIMP CServiceManager::get_AllSvcNames(BSTR* pVal)
         return E_FAIL;
     }
     
+    //wstring -> string
     for (DWORD idx = 0; idx < numServices; ++idx)
     {
         str += utf8_encode(pEnum[idx].lpServiceName) + '\n';
     }
 
-    n = str.c_str();
+    
+    c_str = str.c_str(); //string -> CString
     CloseServiceHandle(hSCManager);
-    bstrMem = n.AllocSysString();
+    bstrMem = c_str.AllocSysString(); //CString -> BSTR
     *pVal = bstrMem;
 
     return S_OK;

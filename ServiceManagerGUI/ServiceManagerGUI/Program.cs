@@ -12,6 +12,8 @@ namespace ServiceManagerGUI
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
+
+            //проверка что нужный COM объект зарегистрирован
             RegistryKey clsid = Registry.ClassesRoot.OpenSubKey("Interface");
             if (!clsid.GetSubKeyNames().Contains("{4557E734-2814-4B45-BFB7-D074C5219B78}"))
             {
@@ -26,7 +28,7 @@ namespace ServiceManagerGUI
             }
             else
             {
-
+                // проверка что у программы есть права администратора 
                 bool isElevated;
                 using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
                 {
@@ -35,6 +37,7 @@ namespace ServiceManagerGUI
                 }
                 if (isElevated)
                 {
+                    // запуск формы
                     ApplicationConfiguration.Initialize();
                     Application.Run(new MainForm());
                 }

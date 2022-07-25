@@ -9,14 +9,15 @@ namespace ServiceManagerGUI
         public MainForm()
         {
             InitializeComponent();
-            serviceManager = new ServiceManager();
+            serviceManager = new ServiceManager(); // COM объект 
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            UpdateService();
+            UpdateService(); // загрузка списка служб
         }
 
+        // запуск выделенной службы
         private void StartButton_Click(object sender, EventArgs e)
         {
             StartButton.Enabled = false;
@@ -47,6 +48,7 @@ namespace ServiceManagerGUI
 
         }
 
+        // остановка службы
         private void StopButton_Click(object sender, EventArgs e)
         {
 
@@ -78,6 +80,7 @@ namespace ServiceManagerGUI
 
         }
 
+        //остановка и зупуск 
         private void ReloadButton_Click(object sender, EventArgs e)
         {
              StopButton.Enabled = false;
@@ -107,6 +110,7 @@ namespace ServiceManagerGUI
             updateButtons();
         }
 
+        // обновление списка служб
         private void UpdateButton_Click(object sender, EventArgs e)
         {
            
@@ -141,12 +145,14 @@ namespace ServiceManagerGUI
             serviceManager.clearMem();
         }
 
+        
         private void dataGridView1_SelectionChanged(object sender, EventArgs e)
         {
 
             updateButtons();
         }
 
+        // данные о службе 
         private void infoButton_Click(object sender, EventArgs e)
         {
             byte status;
@@ -165,6 +171,7 @@ namespace ServiceManagerGUI
 
         }
 
+       
         private string statusToString(byte status)
         {
             switch (status)
@@ -180,6 +187,8 @@ namespace ServiceManagerGUI
 
             return "Ошибка";
         }
+
+        // смена активных кнопок в зависимости от статуса службы
         private void updateButtons()
         {
             if (dataGridView1.SelectedRows.Count == 0)
@@ -209,6 +218,7 @@ namespace ServiceManagerGUI
             }
         }
 
+        // вывод окна с ошибкой при получении ошибки от COM объекта
         private void errorToMessage(COMException comEx)
         {
             string msg;
